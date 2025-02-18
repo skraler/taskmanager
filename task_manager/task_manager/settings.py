@@ -82,8 +82,8 @@ DATABASES = {
         'NAME': 'task_manager_db',
         'USER': 'admin',
         'PASSWORD': '1234',
-        'HOST': '127.0.0.1' ,
-        'PORT': '5433',
+        'HOST': '0.0.0.0',
+        'PORT': '5432',
     }
 }
 

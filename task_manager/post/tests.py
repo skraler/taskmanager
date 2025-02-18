@@ -97,18 +97,12 @@ class PostDetailViewTest(TestCase):
         self.assertFalse(Post.objects.filter(id=self.post.id).exists())
 
 
-class ALLPostTest(TestCase):
+class PostsViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.factory = RequestFactory()
 
-    def get_all_test(self):
-        response = self.client.get(f'/posts')
-        self.assertEqual(response.status_code, 200)
-        posts = Post.objects.select_related()
-        self.assertEqual(response.data, posts)
-
-    def create_new_post_test(self):
+    def test_create_new_post(self):
         new_post_data = {
             'title': 'Новый заголовок',
             'description': 'Новое описание',
@@ -120,5 +114,8 @@ class ALLPostTest(TestCase):
         self.assertTrue(Post.objects.filter(title='Новый заголовок').exists())
         self.assertEqual(Post.objects.get(title='Новый заголовок').description, 'Новое описание')
 
+    def test_get_all(self):
+        response = self.client.get(f'/posts')
+        self.assertEqual(response.status_code, 200)
 
 

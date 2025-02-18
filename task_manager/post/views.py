@@ -17,7 +17,7 @@ class PostListCreateView(generics.ListCreateAPIView):
 
 class PostDetail(APIView):
 
-    def get(self, request, id):
+    def get(self, request: object, id: object) -> object:
         try:
             task = Post.objects.get(pk=id)
         except Post.DoesNotExist:
@@ -26,7 +26,7 @@ class PostDetail(APIView):
         serializer = PostSerializer(task)
         return Response(serializer.data)
 
-    def put(self, request, id):
+    def put(self, request: object, id: int) -> str:
         try:
             task = Post.objects.get(pk=id)
         except Post.DoesNotExist:

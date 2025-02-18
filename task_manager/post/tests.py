@@ -72,7 +72,7 @@ class PostDetailViewTest(TestCase):
         )
 
     def test_get_post(self):
-        response = self.client.get(f'/posts/{self.post.id}/')
+        response = self.client.get(f'/posts/{self.post.id}')
         self.assertEqual(response.status_code, 200)
 
     def test_put_post(self):
@@ -82,7 +82,8 @@ class PostDetailViewTest(TestCase):
             'author': 'Новый автор',
             'likes': 15
         }
-        response = self.client.put(f'/posts/{self.post.id}/', updated_data, format='json')
+
+        response = self.client.put(f'/posts/{self.post.id}', updated_data, format='json')
         self.assertEqual(response.status_code, 200)
         self.post.refresh_from_db()
         self.assertEqual(self.post.title, 'Новый заголовок')
@@ -91,29 +92,33 @@ class PostDetailViewTest(TestCase):
         self.assertEqual(self.post.likes, 15)
 
     def test_delete_post(self):
-        response = self.client.delete(f'/posts/{self.post.id}/')
+        response = self.client.delete(f'/posts/{self.post.id}')
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Post.objects.filter(id=self.post.id).exists())
 
 
-class PostTestCase(TestCase):
+class ALLPostTest(TestCase):
     def setUp(self):
-        author = 'Test Author'
-        self.post = Post.objects.create(
-            title='Test Post',
-            description='Test Description',
-            author=author,
-            likes=0
-        )
+        self.client = APIClient()
+        self.factory = RequestFactory()
 
-    def test_post_title(self):
-        self.assertEqual(self.post.title, 'Test Post')
+    def get_all_test(self):
+        response = self.client.get(f'/posts')
+        self.assertEqual(response.status_code, 200)
+        posts = Post.objects.select_related()
+        self.assertEqual(response.data, posts)
 
-    def test_post_description(self):
-        self.assertEqual(self.post.description, 'Test Description')
+    def create_new_post_test(self):
+        new_post_data = {
+            'title': 'Новый заголовок',
+            'description': 'Новое описание',
+            'author': 'Новый автор',
+            'likes': 15
+        }
+        response = self.client.post('/posts', new_post_data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Post.objects.filter(title='Новый заголовок').exists())
+        self.assertEqual(Post.objects.get(title='Новый заголовок').description, 'Новое описание')
 
-    def test_post_author(self):
-        self.assertEqual(self.post.author, 'Test Author')
 
-    def test_post_likes(self):
-        self.assertEqual(self.post.likes, 0)
+
